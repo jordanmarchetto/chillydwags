@@ -4,14 +4,14 @@
  *      also does attendanceMode and not
  * Props:
  *  player_details - the player object to present
- *  takeAttendance - true/false, if we're in attendance mode
+ *  attendanceMode - true/false, if we're in attendance mode
  * State:
  *  present - attendanceMode, if the player is actually present 
  * TODO: represent the player in state, so that we can ditch the callback stuff
- * TODO: update the toggle button
  */
 import React, { Component } from 'react';
 import { ToggleOff, ToggleOn, Edit as Pencil } from '@material-ui/icons';
+import { Switch } from '@material-ui/core';
 
 class Player extends Component {
 
@@ -61,11 +61,11 @@ class Player extends Component {
     // "uga_id": 4929999703282791
     // "active": 1 }, 
     render() {
-        const { player_details, takeAttendance } = this.props;
+        const { player_details, attendanceMode } = this.props;
         const rendered_nick = (player_details.nickname) ? '"' + player_details.nickname + '"' : "";
         const active = this.state.present ? "active player-card" : "player-card";
 
-        if (takeAttendance) {
+        if (attendanceMode) {
             //attendanceMode
             return (
                 <div className={active} onClick={this.togglePlayerPresent}>
@@ -76,7 +76,15 @@ class Player extends Component {
 
                     </div>
                     <div className="toggle-button" >
-                        {this.state.present ? <ToggleOn fontSize="large" className="toggle-on" /> : <ToggleOff fontSize="large" className="toggle-off" />}
+                        {/*this.state.present ? <ToggleOn fontSize="large" className="toggle-on" /> : <ToggleOff fontSize="large" className="toggle-off" />*/}
+                        <Switch
+                            checked={this.state.present}
+                            classes={{
+                                switchBase: "switch-toggle-base",
+                                checked: "switch-toggle-checked",
+                                bar: "switch-toggle-bar",
+                            }}
+                        />
                     </div>
 
                     <div className="all-details">

@@ -20,7 +20,6 @@ import Player from './Player';
 import PlayerEdit from './PlayerEdit';
 import Loading from './Loading';
 
-
 class Roster extends Component {
 
     static defaultProps = {
@@ -215,8 +214,7 @@ class Roster extends Component {
 
     render() {
         const { error, isLoaded, players, total_players, present_players, editPlayerId } = this.state;
-        const { attendanceMode } = this.props;
-
+        const attendanceMode = this.props.takeAttendance;
 
         if (error) {
             //Show error from api fail

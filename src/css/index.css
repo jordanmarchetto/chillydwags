@@ -377,10 +377,13 @@ main {
   white-space: nowrap;
 }
 
+.switch-toggle-checked,
 .toggle-on {
-  color: var(--secondary-color);
+  color: var(--secondary-color) !important;
 }
-
+.switch-toggle-checked + .switch-toggle-bar{
+  background-color: var(--secondary-dark) !important;
+}
 .all-details {
   display: none;
 }

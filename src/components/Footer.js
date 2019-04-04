@@ -10,7 +10,7 @@ class Footer extends Component {
         return (
             <footer>
                 <div className="footer-wrapper">
-                    <a href="https://api.jmar.dev"><span className="footer-icon"><SubdirectoryArrowRight fontSize="small" /></span>Jordan Marchetto</a> {`${process.env.PUBLIC_URL}/`}
+                    <a href="https://api.jmar.dev"><span className="footer-icon"><SubdirectoryArrowRight fontSize="small" /></span>Jordan Marchetto</a> 
                 </div>
             </footer>
         )
