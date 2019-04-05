@@ -19,6 +19,7 @@ import React, { Component } from 'react';
 import Player from './Player';
 import PlayerEdit from './PlayerEdit';
 import Loading from './Loading';
+import { AddCircleOutline } from '@material-ui/icons';
 
 class Roster extends Component {
 
@@ -41,6 +42,7 @@ class Roster extends Component {
         isLoaded: false,
         players: [],
         editPlayerId: null,
+        addingNewPlayer:false,
         present_players: null,
         total_players: null
     }
@@ -147,46 +149,85 @@ class Roster extends Component {
             console.log("Saving Player, full data:");
             console.log(player_details);
         }
+        if(this.state.addingNewPlayer){
+            let post_url = "https://api.jmar.dev/chillydwags/players/" 
+            let updated_players = [...this.state.players];
+            fetch(post_url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(
+                    player_details
+                )
+            }).then(response => {
+                //we don't really care about the response
+                if (this.props.verbose) {
+                    console.log("Successfully POST to server");
+                }
+                //make a copy of the current player list
+                updated_players.push(response.json());
 
-        let post_url = "https://api.jmar.dev/chillydwags/players/" + player_details.id;
-        fetch(post_url, {
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(
-                player_details
-            )
-        }).then(response => {
-            //we don't really care about the response
-            if (this.props.verbose) {
-                console.log("Successfully PUT to server");
-            }
-        }).catch(error => {
-            if (this.props.verbose) {
-                console.log("Error saving player to server");
-                console.log(error);
+            }).catch(error => {
+                if (this.props.verbose) {
+                    console.log("Error saving player to server");
+                    console.log(error);
 
-            }
-            this.setState({
-                error
+                }
+                this.setState({
+                    error
+                });
+                //update the state's player list to our new one
+                this.setState({ editPlayerId: null, players: updated_players, addingNewPlayer: false });
+
+            })
+        } else {
+            let post_url = "https://api.jmar.dev/chillydwags/players/" + player_details.id;
+            fetch(post_url, {
+                method: 'PUT',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(
+                    player_details
+                )
+            }).then(response => {
+                //we don't really care about the response
+                if (this.props.verbose) {
+                    console.log("Successfully PUT to server");
+                }
+            }).catch(error => {
+                if (this.props.verbose) {
+                    console.log("Error saving player to server");
+                    console.log(error);
+
+                }
+                this.setState({
+                    error
+                });
+            })
+
+            //make a copy of the current player list
+            let updated_players = [...this.state.players];
+
+            //find the matching player
+            this.state.players.forEach(function (player, i) {
+                if (player.id === player_details.id) {
+                    updated_players[i] = player_details;
+                }
             });
-        })
 
-        //make a copy of the current player list
-        let updated_players = [...this.state.players];
-
-        //find the matching player
-        this.state.players.forEach(function (player, i) {
-            if (player.id === player_details.id) {
-                updated_players[i] = player_details;
-            }
-        });
-
-        //update the state's player list to our new one
-        this.setState({ editPlayerId: null, players: updated_players });
+            //update the state's player list to our new one
+            this.setState({ editPlayerId: null, players: updated_players });
+        }
     } //end savePlayer
+
+    //open the 'new player' window
+    newPlayer = () => {
+        this.setState({ addingNewPlayer: true });
+    } //end newPlayer
 
     //callback for <PlayerEdit> to close the modal
     closePlayer = () => {
@@ -213,7 +254,7 @@ class Roster extends Component {
 
 
     render() {
-        const { error, isLoaded, players, total_players, present_players, editPlayerId } = this.state;
+        const { error, isLoaded, players, total_players, present_players, editPlayerId, addingNewPlayer } = this.state;
         const attendanceMode = this.props.takeAttendance;
 
         if (error) {
@@ -260,6 +301,12 @@ class Roster extends Component {
                                     onEditClick={this.handleEditClick}
                                 />
                             ))}
+                            <div className="player-card add-player-card">
+                                <button onClick={this.newPlayer} className="btn hidden-desktop"><AddCircleOutline fontSize="small" className="inline-icon" /> Add Player</button>
+                                <button onClick={this.newPlayer} className="add-button hidden-mobile">
+                                    <AddCircleOutline fontSize="large" classes={{ root: "giant-icon" }} className="inline-icon" /> 
+                                </button>
+                            </div>
                         </div>
                         <div className="player-modals">
                             {players.map(item => (
@@ -273,6 +320,13 @@ class Roster extends Component {
                                 ) : (null)
 
                             ))}
+                            {addingNewPlayer ?
+                                <PlayerEdit
+                                    newPlayer={true}
+                                    onSave={this.savePlayer}
+                                    onClose={this.closePlayer}
+                                />
+                                : ''}
                         </div>
 
                     </div>
