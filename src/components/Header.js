@@ -48,7 +48,7 @@ class Header extends Component {
                     <a className="menu-btn" href="https://docs.google.com/spreadsheets/d/1BtZMeBJQokDkfN_v1NyShBI3sbkF8kVe6MuVJsIC1EA/edit#gid=0">Spreadsheet</a>
                 </Menu>
                 <div className="header-wrapper">
-                    <h1>Chillydwags</h1>
+                    <h1><NavLink to="/dashboard">Chillydwags</NavLink></h1>
                 </div>
                 <div className="fake-shadow"> </div>
             </header>

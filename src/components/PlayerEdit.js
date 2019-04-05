@@ -11,7 +11,8 @@
  */
 import React, { Component } from 'react';
 import Modal from 'react-modal';
-import { TextField, Radio, RadioGroup, FormLabel, FormControlLabel, FormControl } from '@material-ui/core';
+import { TextField, Radio, RadioGroup, FormGroup, FormLabel, FormControlLabel, FormControl } from '@material-ui/core';
+import { Edit as Pencil } from '@material-ui/icons';
 import * as yup from 'yup';
 
 Modal.setAppElement('#react-container')
@@ -24,8 +25,25 @@ class PlayerEdit extends Component {
         //while not the best practice, this works as a way to store changes while
         //  editing, and then delete them if we close the modal without saving
         let newP = Object.assign({}, props.player_details);
+
+        //create a data schema to use for form validation
+        let schema = yup.object().shape({
+            first_name: yup.string().required(),
+            last_name: yup.string(),
+            nickname: yup.string(),
+            usau_id: yup.number(),
+            uga_id: yup.number(),
+            email: yup.string().email().required(),
+            uga_email: yup.string().email(),
+            phone: yup.string(),
+            profile_image: yup.string().url(),
+            active: yup.number(),
+        })
+
         this.state = {
             modalIsOpen: true,
+            errors: {},
+            schema: schema,
             edit_player: newP
         };
 
@@ -68,78 +86,83 @@ class PlayerEdit extends Component {
     //when the event is triggered, we snag the key/val and push to our temp player
     //then call form validate function
     //TODO: consider dynamically reformatting phone number here
-    handleChange = (event) => {
+    handleChange = async (event) => {
         //copy the obj, then update the value per the triggered event
         let key = event.target.name;
         let val = event.target.value;
         let newP = this.state.edit_player;
+
+        //check for 'active' since it's a 1/0 value
+        if (key === "active") {
+            val = parseInt(val);
+        }
         newP[key] = val;
+
 
         //push change to state and re-validate form
         this.setState({ edit_player: newP }, this.validateForm);
+
+
     } //end handleChange
 
     //do the form validation
     //show errors in the appropriate place
     //returns true/false if the form is valid
-    validateForm = () => {
+    validateForm = async () => {
         let result = false;
 
-        //data schema to validate against
-        let schema = yup.object().shape({
-            first_name: yup.string().required(),
-            last_name: yup.string(),
-            nickname: yup.string(),
-            usau_id: yup.number(),
-            uga_id: yup.number(),
-            email: yup.string().email().required(),
-            uga_email: yup.string().email(),
-            phone: yup.string(),
-            profile_image: yup.string().url(),
-            //active: yup.number(),
-        })
-
-        let error_div = document.getElementById("error-text");
-        const edit_player = this.state.edit_player;
+        const error_div = document.getElementById("error-text");
+        const { edit_player, schema } = this.state;
+        let error_list = {};
 
         //run validation, push errors where they go
-        schema.validate(edit_player, { abortEarly: false }).then(function (value) {
+        await schema.validate(edit_player, { abortEarly: false }).then(function (value) {
             //no errors, we're valid now
             error_div.innerHTML = "";
+            result = true;
         }).catch(function (err) {
             error_div.innerHTML = "<ul>";
             for (var i = 0; i < err.errors.length; i++) {
-                console.log("i: " + i + ", e: " + err.errors[i]);
                 error_div.innerHTML += "<li>" + err.errors[i] + "</li>";
+                error_list[err.inner[i].path] = true;
             }
             error_div.innerHTML += "</ul>";
         });
 
+        //update the state
+        this.setState({ errors: error_list });
         return result;
     } //end validateForm
 
     //called when we click save
     //we should revalidate the form and decide whether or not to call the roster callback
-    updatePlayer = () => {
+    updatePlayer = async () => {
         const { onSave } = this.props;
         const { edit_player } = this.state;
         //we're using the state player, otherwise, we'd pull the form data:
         //const data = new FormData(document.getElementById("player-edit"));
 
-        if (this.validateForm()) {
-            console.log("updatePlayer valid form");
+        if (await this.validateForm()) {
+            //form is valid
+            //close the modal and do the callback to the roster
+            this.closeModal();
+            onSave(edit_player);
         } else {
-            console.log("updatePlayer INVALID form");
+            //form was invalid
+            //we should never hit this state because the form shouldn't be
+            // submitable if it's invalid
+            console.log("Error: Invalid form submitted");
         }
 
-        //the rest of this should be conditional:
-        this.closeModal();
 
-        console.log("player after");
-        console.log(edit_player);
-        onSave(edit_player);
     } //end updatePlayer
 
+
+    //wrapper for form submission
+    //mostly so we can use the enter key to submit
+    submitForm = () => {
+        this.updatePlayer();
+    } //end submitForm
 
     //{ "id": 1, "created_at": "2019-03-22 12:23:28", "updated_at": "2019-03-22 12:23:28"
     // "first_name": "Robby"
@@ -154,7 +177,10 @@ class PlayerEdit extends Component {
     // "active": 1 }, 
     render() {
         const player_details = this.state.edit_player;
+        const errors = this.state.errors;
         const nicer_nick = (player_details.nickname) ? '"' + player_details.nickname + '"' : "";
+        const disabled = (Object.keys(errors).length > 0) ? true : false;
+
 
         return (
             <Modal
@@ -171,62 +197,264 @@ class PlayerEdit extends Component {
                         <h2>{player_details.first_name} {nicer_nick} {player_details.last_name}</h2>
                     </div>
                     <div className="body">
-                        <p id="error-text" className="error-text"></p>
-                        <form id="player-edit">
-                            <TextField
-                                name="first_name" onChange={this.handleChange} defaultValue={player_details.first_name} id="edit_first_name" variant="outlined" label="First Name"
-                            />
-                            <TextField
-                                name="nickname" onChange={this.handleChange} defaultValue={player_details.nickname} id="edit_nickname" variant="outlined" label="Nickname"
-                            />
-                            <TextField
-                                name="last_name" onChange={this.handleChange} defaultValue={player_details.last_name} id="edit_last_name" variant="outlined" label="Last Name"
-                            />
-                            <TextField
-                                name="profile_image" onChange={this.handleChange} defaultValue={player_details.profile_image} id="edit_profile_image" variant="outlined" label="Profile Image"
-                            />
-                            <TextField
-                                name="phone" onChange={this.handleChange} defaultValue={player_details.phone} id="edit_phone" variant="outlined" label="Phone"
-                            />
-                            <TextField
-                                name="email" onChange={this.handleChange} defaultValue={player_details.email} id="edit_email" variant="outlined" label="Email"
-                            />
-                            <TextField
-                                name="uga_email" onChange={this.handleChange} defaultValue={player_details.uga_email} id="edit_uga_email" variant="outlined" label="UGA Email"
-                            />
-                            <TextField
-                                name="uga_id" onChange={this.handleChange} defaultValue={player_details.uga_id} id="edit_uga_id" variant="outlined" label="UGA ID"
-                            />
-                            <TextField
-                                name="usau_id" onChange={this.handleChange} defaultValue={player_details.usau_id} id="edit_usau_id" variant="outlined" label="USAU ID"
-                            />
-                            <TextField
-                                name="active" onChange={this.handleChange} defaultValue={player_details.active} id="edit_active" variant="outlined" label="Active"
-                            />
+                        <div className="edit-player-body-wrapper">
+                            <div className="edit-player-image">
+                                <div className="edit-image-wrapper">
+                                    <img className="profile-image" src={player_details.profile_image} alt={player_details.first_name + " " + player_details.last_name + "'s avatar"} />
+                                    <div className="edit-image-button"><Pencil fontSize="small" className="inline-icon" /> Edit</div>
+                                </div>
+                                <p id="error-text" className="error-text"></p>
+                            </div>
+                            <div className="form-fields-wrapper">
+                                <form id="player-edit" onSubmit={disabled ? null : this.submitForm} method="POST">
+                                    {disabled ? "" : <input type="submit" className="hidden" tabIndex="-1" />}
+                                    <TextField
+                                        error={errors.first_name}
+                                        name="first_name"
+                                        className="edit-field"
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.first_name}
+                                        id="edit_first_name"
+                                        InputLabelProps={{
+                                            classes: {
+                                                focused: "input-focused",
+                                            }
+                                        }}
+                                        InputProps={{
+                                            classes: {
+                                                root: "input-root",
+                                                focused: "input-focused",
+                                                notchedOutline: "input-notchedOutline"
+                                            },
+                                        }}
+                                        variant="outlined"
+                                        label="First Name"
+                                    />
+                                    <TextField
+                                        name="nickname"
+                                        className="edit-field"
+                                        error={errors.nickname}
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.nickname}
+                                        id="edit_nickname"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            classes: {
+                                                focused: "input-focused",
+                                            }
+                                        }}
+                                        InputProps={{
+                                            classes: {
+                                                root: "input-root",
+                                                focused: "input-focused",
+                                                notchedOutline: "input-notchedOutline"
+                                            },
+                                        }}
+                                        label="Nickname"
+                                    />
+                                    <TextField
+                                        name="last_name"
+                                        error={errors.last_name}
+                                        className="edit-field"
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.last_name}
+                                        id="edit_last_name"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            classes: {
+                                                focused: "input-focused",
+                                            }
+                                        }}
+                                        InputProps={{
+                                            classes: {
+                                                root: "input-root",
+                                                focused: "input-focused",
+                                                notchedOutline: "input-notchedOutline"
+                                            },
+                                        }}
+                                        label="Last Name"
+                                    />
+                                    {/*
+                                    TODO: allow for image upload?
+                                    <TextField
+                                        name="profile_image"
+                                        className="edit-field"
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.profile_image}
+                                        id="edit_profile_image"
+                                        variant="outlined"
+                                        label="Profile Image"
+                                    />
+                                    */}
+                                    <TextField
+                                        name="phone"
+                                        error={errors.phone}
+                                        className="edit-field"
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.phone}
+                                        id="edit_phone"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            classes: {
+                                                focused: "input-focused",
+                                            }
+                                        }}
+                                        InputProps={{
+                                            classes: {
+                                                root: "input-root",
+                                                focused: "input-focused",
+                                                notchedOutline: "input-notchedOutline"
+                                            },
+                                        }}
+                                        label="Phone"
+                                    />
+                                    <TextField
+                                        error={errors.email}
+                                        name="email"
+                                        className="edit-field"
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.email}
+                                        id="edit_email"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            classes: {
+                                                focused: "input-focused",
+                                            }
+                                        }}
+                                        InputProps={{
+                                            classes: {
+                                                root: "input-root",
+                                                focused: "input-focused",
+                                                notchedOutline: "input-notchedOutline"
+                                            },
+                                        }}
+                                        label="Email"
+                                    />
+                                    <TextField
+                                        name="uga_email"
+                                        error={errors.uga_email}
+                                        className="edit-field"
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.uga_email}
+                                        id="edit_uga_email"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            classes: {
+                                                focused: "input-focused",
+                                            }
+                                        }}
+                                        InputProps={{
+                                            classes: {
+                                                root: "input-root",
+                                                focused: "input-focused",
+                                                notchedOutline: "input-notchedOutline"
+                                            },
+                                        }}
+                                        label="UGA Email"
+                                    />
+                                    <TextField
+                                        name="uga_id"
+                                        error={errors.uga_id}
+                                        className="edit-field"
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.uga_id}
+                                        id="edit_uga_id"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            classes: {
+                                                focused: "input-focused",
+                                            }
+                                        }}
+                                        InputProps={{
+                                            classes: {
+                                                root: "input-root",
+                                                focused: "input-focused",
+                                                notchedOutline: "input-notchedOutline"
+                                            },
+                                        }}
+                                        label="UGA ID"
+                                    />
+                                    <TextField
+                                        name="usau_id"
+                                        error={errors.usau_id}
+                                        className="edit-field"
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.usau_id}
+                                        id="edit_usau_id"
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            classes: {
+                                                focused: "input-focused",
+                                            }
+                                        }}
+                                        InputProps={{
+                                            classes: {
+                                                root: "input-root",
+                                                focused: "input-focused",
+                                                notchedOutline: "input-notchedOutline"
+                                            },
+                                        }}
+                                        label="USAU ID"
+                                    />
+                                    {/*
+                                    <TextField
+                                        name="active"
+                                        className="edit-field"
+                                        onChange={this.handleChange}
+                                        defaultValue={player_details.active}
+                                        id="edit_active"
+                                        variant="outlined"
+                                        label="Active"
+                                    />*/}
 
-                            {/*https://material-ui.com/demos/selection-controls/*/}
-                            {/*https://codesandbox.io/s/7wyylw45q1*/}
-                            <FormControl component="fieldset">
-                                <FormLabel component="legend">Gender</FormLabel>
-                                <RadioGroup
-                                    aria-label="Gender"
-                                    name="gender1"
-                                >
-                                    <FormControlLabel value="female" control={<Radio />} label="Female" />
-                                    <FormControlLabel value="male" control={<Radio />} label="Male" />
-                                    <FormControlLabel value="other" control={<Radio />} label="Other" />
-
-                                </RadioGroup>
-                            </FormControl>
-
-                        </form>
+                                    {/*https://material-ui.com/demos/selection-controls/*/}
+                                    {/*https://codesandbox.io/s/7wyylw45q1*/}
+                                    <FormGroup row={true}>
+                                        <FormControl component="fieldset" fullWidth={true}>
+                                            <FormLabel component="legend">Active Player</FormLabel>
+                                            <RadioGroup
+                                                aria-label="Active Player"
+                                                name="active_player"
+                                                className="inline-radio-group"
+                                            >
+                                                <FormControlLabel
+                                                    value="1"
+                                                    id="edit_active"
+                                                    control={
+                                                        <Radio
+                                                            checked={player_details.active === 1 ? true : false}
+                                                            classes={{
+                                                                checked: "radio-checked",
+                                                            }}
+                                                            onChange={this.handleChange}
+                                                            name="active"
+                                                        />
+                                                    } label="Yes" />
+                                                <FormControlLabel
+                                                    value="0"
+                                                    control={
+                                                        <Radio
+                                                            checked={player_details.active === 0 ? true : false}
+                                                            onChange={this.handleChange}
+                                                            classes={{
+                                                                checked: "radio-checked",
+                                                            }}
+                                                            name="active"
+                                                        />
+                                                    } label="No" />
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </FormGroup>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                     <div className="footer">
-                        <button onClick={this.updatePlayer} className="btn btn-secondary">Save</button>
-                        <button onClick={this.closeModal} className="btn btn-secondary">Close</button>
+                        <div className="footer-wrapper">
+                            <button onClick={this.submitForm} className="modal-button submit" disabled={disabled}>Save</button>
+                            <button onClick={this.closeModal} className="modal-button cancel">Close</button>
+                        </div>
                     </div>
-
-
                 </div>
             </Modal>
         )

@@ -10,7 +10,7 @@
  * TODO: represent the player in state, so that we can ditch the callback stuff
  */
 import React, { Component } from 'react';
-import { ToggleOff, ToggleOn, Edit as Pencil } from '@material-ui/icons';
+import { Edit as Pencil } from '@material-ui/icons';
 import { Switch } from '@material-ui/core';
 
 class Player extends Component {
@@ -76,7 +76,6 @@ class Player extends Component {
 
                     </div>
                     <div className="toggle-button" >
-                        {/*this.state.present ? <ToggleOn fontSize="large" className="toggle-on" /> : <ToggleOff fontSize="large" className="toggle-off" />*/}
                         <Switch
                             checked={this.state.present}
                             classes={{
