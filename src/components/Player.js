@@ -40,12 +40,15 @@ class Player extends Component {
 
     //take the string of numbers and make them prettier
     formatPhoneNumber = (phone_string) => {
-        let phone_string_clean = phone_string.toString().replace(/\D/g, '');
-        let matches = phone_string_clean.match(/(\d{3})(\d{3})(\d{4})$/);
-        if (matches) {
-            return '(' + matches[1] + ') ' + matches[2] + '-' + matches[3];
+        if (phone_string) {
+            let phone_string_clean = phone_string.toString().replace(/\D/g, '');
+            let matches = phone_string_clean.match(/(\d{3})(\d{3})(\d{4})$/);
+            if (matches) {
+                return '(' + matches[1] + ') ' + matches[2] + '-' + matches[3];
+            }
+        } else {
+            return "";
         }
-        return null;
     } //end formatPhoneNumber
 
 
@@ -64,12 +67,15 @@ class Player extends Component {
         const { player_details, attendanceMode } = this.props;
         const rendered_nick = (player_details.nickname) ? '"' + player_details.nickname + '"' : "";
         const active = this.state.present ? "active player-card" : "player-card";
+        const default_image = "http://lorempixel.com/g/200/200/animals";
+        const image_path = player_details.profile_image?player_details.profile_image:default_image;
+
 
         if (attendanceMode) {
             //attendanceMode
             return (
                 <div className={active} onClick={this.togglePlayerPresent}>
-                    <img className="profile-image" src={player_details.profile_image} alt={player_details.first_name + " " + player_details.last_name + "'s avatar"} />
+                    <img className="profile-image" src={image_path} alt={player_details.first_name + " " + player_details.last_name + "'s avatar"} />
                     <div className="player-details">
                         <div className="player-name">{player_details.first_name} {rendered_nick} {player_details.last_name}</div>
                         <div className="list-view-phone">{this.formatPhoneNumber(player_details.phone)}</div>
@@ -88,9 +94,9 @@ class Player extends Component {
 
                     <div className="all-details">
                         <ul>
-                            <li>{player_details.first_name} {rendered_nick} {player_details.last_name}</li>
+                            {/*<li>{player_details.first_name} {rendered_nick} {player_details.last_name}</li>*/}
                             <li>{this.formatPhoneNumber(player_details.phone)}</li>
-                            <li><a href={player_details.profile_image}>Profile Image</a></li>
+                            <li><a href={image_path}>Profile Image</a></li>
                             <li>UGA: {player_details.uga_id}</li>
                             <li>USAU: {player_details.usau_id}</li>
                             <li><a href={"mailto:" + player_details.email}>{player_details.email}</a></li>
@@ -104,7 +110,7 @@ class Player extends Component {
         } else {
             return (
                 <div className={active}>
-                    <img className="profile-image" src={player_details.profile_image} alt={player_details.first_name + " " + player_details.last_name + "'s avatar"} />
+                    <img className="profile-image" src={image_path} alt={player_details.first_name + " " + player_details.last_name + "'s avatar"} />
                     <div className="player-details">
                         <div className="player-name">{player_details.first_name} {rendered_nick} {player_details.last_name}</div>
                         <div className="list-view-phone">{this.formatPhoneNumber(player_details.phone)}</div>
@@ -115,9 +121,9 @@ class Player extends Component {
                     </div>
                     <div className="all-details">
                         <ul>
-                            <li>{player_details.first_name} {rendered_nick} {player_details.last_name}</li>
+                            {/*<li>{player_details.first_name} {rendered_nick} {player_details.last_name}</li>*/}
                             <li>{this.formatPhoneNumber(player_details.phone)}</li>
-                            <li><a href={player_details.profile_image}>Profile Image</a></li>
+                            <li><a href={image_path}>Profile Image</a></li>
                             <li>UGA: {player_details.uga_id}</li>
                             <li>USAU: {player_details.usau_id}</li>
                             <li><a href={"mailto:" + player_details.email}>{player_details.email}</a></li>

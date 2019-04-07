@@ -12,11 +12,13 @@
     "npm": "^6.9.0",
     "react": "^16.8.4",
     "react-burger-menu": "^2.6.5",
+    "react-confirm-alert": "^2.4.0",
     "react-dom": "^16.8.4",
     "react-formalized": "^1.0.6",
     "react-modal": "^3.8.1",
     "react-router-dom": "^5.0.0",
     "react-scripts": "2.1.8",
+    "typescript": "^3.4.2",
     "yup": "^0.27.0"
   },
   "homepage": "https://www.jmar.dev/chillydwags",
@@ -34,5 +36,10 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "react-native": "^0.59.3",
+    "reactotron-react-js": "^3.0.1",
+    "reactotron-react-native": "^3.2.1"
+  }
 }

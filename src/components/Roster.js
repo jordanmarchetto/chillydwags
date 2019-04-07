@@ -25,7 +25,7 @@ class Roster extends Component {
 
     static defaultProps = {
         version: "None",
-        verbose: false,
+        verbose: true,
         attendanceMode: false,
         dummy_players: [
             { "id": 1, "present": true, "profile_image": "https://lorempixel.com/100/100/cats/?53695", "created_at": "2019-03-22 12:23:28", "updated_at": "2019-03-22 12:23:28", "first_name": "Robby", "last_name": "Roos", "nickname": "Dooley", "phone": "+1-443-775-5095", "email": "robby.oconnell@upton.com", "uga_email": "hyatt.marcelino@grant.net", "usau_id": 4485966641374291, "uga_id": 4929999703282791, "active": 1 },
@@ -42,7 +42,7 @@ class Roster extends Component {
         isLoaded: false,
         players: [],
         editPlayerId: null,
-        addingNewPlayer:false,
+        addingNewPlayer: false,
         present_players: null,
         total_players: null
     }
@@ -141,18 +141,69 @@ class Roster extends Component {
         this.setState({ editPlayerId: player_details.id });
     } //end handleEditClick
 
+
+    //callback for when we click delete in <PlayerEdit>
+    deletePlayer = async (player_details) => {
+        if (this.props.verbose) {
+                console.log("Deleting Player: " + player_details.id);
+        }
+
+        let post_url = "https://api.jmar.dev/chillydwags/players/" + player_details.id;
+        fetch(post_url, {
+            method: 'Delete',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(
+                player_details
+            )
+        }).then(response => {
+            //we don't really care about the response
+            if (this.props.verbose) {
+                console.log("Successfully DELETE'd on server");
+            }
+        }).catch(error => {
+            if (this.props.verbose) {
+                console.log("Error saving player to server");
+                console.log(error);
+
+            }
+            this.setState({
+                error
+            });
+        })
+
+
+        //loop through players and add ones that weren't deleted
+        //  back to our temporary array
+        let updated_players = [];
+        this.state.players.forEach(function (player, i) {
+            if (player.id !== player_details.id) {
+                updated_players.push(player);
+            }
+        });
+
+        //update the state's player list to our new one
+        this.setState({ editPlayerId: null, players: updated_players });
+    } //end deletePlayer
+
     //callback for the save button in <PlayerEdit>
+    // only called when we're adding a new player
     //actually saves the player data to the server
     //the player object _should_ be valid at this point
-    savePlayer = (player_details) => {
+    addPlayer = async (player_details) => {
         if (this.props.verbose) {
-            console.log("Saving Player, full data:");
+            console.log("Adding Player, full data:");
             console.log(player_details);
         }
-        if(this.state.addingNewPlayer){
-            let post_url = "https://api.jmar.dev/chillydwags/players/" 
+            console.log("body:");
+            console.log(JSON.stringify(player_details));
+
+            this.setState({ isLoaded: false });
+            let post_url = "https://api.jmar.dev/chillydwags/players"
             let updated_players = [...this.state.players];
-            fetch(post_url, {
+            await fetch(post_url, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -162,12 +213,23 @@ class Roster extends Component {
                     player_details
                 )
             }).then(response => {
-                //we don't really care about the response
+                if (response.ok) {
+                    if (this.props.verbose) {
+                        console.log("Response:")
+                        console.log(response.clone().json());
+                    }
+                    return response.json();
+                } else {
+                    throw new Error('Something went wrong ...');
+                }
+            }).then((result) => {
+
                 if (this.props.verbose) {
-                    console.log("Successfully POST to server");
+                    console.log("Really Successfully POST to server");
+                    console.log(result);
                 }
                 //make a copy of the current player list
-                updated_players.push(response.json());
+                updated_players.push(result);
 
             }).catch(error => {
                 if (this.props.verbose) {
@@ -176,13 +238,27 @@ class Roster extends Component {
 
                 }
                 this.setState({
-                    error
+                    error: true
                 });
-                //update the state's player list to our new one
-                this.setState({ editPlayerId: null, players: updated_players, addingNewPlayer: false });
-
             })
-        } else {
+            if (this.props.verbose) {
+                console.log("Updating the state:");
+                console.log(this.state);
+            }
+
+            //update the state's player list to our new one
+            this.setState({ editPlayerId: null, players: updated_players, addingNewPlayer: false, isLoaded:true });
+            console.log(this.state);
+    } //end addPlayer
+
+    //callback for the save button in <PlayerEdit>
+    //actually saves the player data to the server
+    //the player object _should_ be valid at this point
+    savePlayer = (player_details) => {
+        if (this.props.verbose) {
+            console.log("Saving Player, full data:");
+            console.log(player_details);
+        }
             let post_url = "https://api.jmar.dev/chillydwags/players/" + player_details.id;
             fetch(post_url, {
                 method: 'PUT',
@@ -221,7 +297,6 @@ class Roster extends Component {
 
             //update the state's player list to our new one
             this.setState({ editPlayerId: null, players: updated_players });
-        }
     } //end savePlayer
 
     //open the 'new player' window
@@ -232,7 +307,7 @@ class Roster extends Component {
     //callback for <PlayerEdit> to close the modal
     closePlayer = () => {
         //closing the player dialog/doing nothing with the changes
-        this.setState({ editPlayerId: null });
+        this.setState({ editPlayerId: null, addingNewPlayer: false });
     } //end closePlayer
 
     //used in attendance mode to calculate the number of sprints owed
@@ -304,7 +379,7 @@ class Roster extends Component {
                             <div className="player-card add-player-card">
                                 <button onClick={this.newPlayer} className="btn hidden-desktop"><AddCircleOutline fontSize="small" className="inline-icon" /> Add Player</button>
                                 <button onClick={this.newPlayer} className="add-button hidden-mobile">
-                                    <AddCircleOutline fontSize="large" classes={{ root: "giant-icon" }} className="inline-icon" /> 
+                                    <AddCircleOutline fontSize="large" classes={{ root: "giant-icon" }} className="inline-icon" />
                                 </button>
                             </div>
                         </div>
@@ -316,6 +391,7 @@ class Roster extends Component {
                                         player_details={item}
                                         onSave={this.savePlayer}
                                         onClose={this.closePlayer}
+                                        onDelete={this.deletePlayer}
                                     />
                                 ) : (null)
 
@@ -323,7 +399,7 @@ class Roster extends Component {
                             {addingNewPlayer ?
                                 <PlayerEdit
                                     newPlayer={true}
-                                    onSave={this.savePlayer}
+                                    onSave={this.addPlayer}
                                     onClose={this.closePlayer}
                                 />
                                 : ''}

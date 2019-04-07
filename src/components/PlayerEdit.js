@@ -15,6 +15,10 @@ import { TextField, Radio, RadioGroup, FormGroup, FormLabel, FormControlLabel, F
 import { Edit as Pencil } from '@material-ui/icons';
 import * as yup from 'yup';
 
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import '../css/react-confirm.css'; // Import css
+
+
 Modal.setAppElement('#react-container')
 
 class PlayerEdit extends Component {
@@ -158,6 +162,68 @@ class PlayerEdit extends Component {
     } //end updatePlayer
 
 
+    //initial response to clicking delete
+    deletePlayer = async () => {
+        const { onDelete } = this.props;
+        const { edit_player } = this.state;
+
+        //https://www.npmjs.com/package/react-confirm-alert
+        await confirmAlert({
+            /*
+            title: 'Delete this player?',
+            message: 'Are you sure you want to permanently delete ' + edit_player.first_name + "?",
+            buttons: [
+                {
+                    label: 'Yes',
+                    onClick: () => {
+                        this.closeModal();
+                        onDelete(edit_player);
+                    }
+                },
+                {
+                    label: 'No',
+                    //onClick: () => alert('Click No')
+                }
+            ] 
+            */
+            customUI: ({ onClose }) => {
+                return (
+                    <div className="player-edit-modal">
+                        <div className='player-edit-modal-content'>
+                            <div className="header">
+                                <h2>Delete this player?</h2>
+                            </div>
+                            <div className="body">
+                                <p>Are you sure you want to permanently delete {edit_player.first_name}?</p>
+                            </div>
+                            <div className="footer">
+
+
+                            <div className="footer-wrapper">
+                                <button
+                                className="modal-button submit" 
+                                    onClick={() => {
+                                        //this.handleClickDelete();
+                                        this.closeModal();
+                                        onDelete(edit_player);
+                                        onClose();
+                                    }}
+                                >
+                                    Yes
+                    </button>
+
+                                <button onClick={onClose} className="modal-button cancel">No</button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+        });
+
+    } //end deletePlayer
+
     //wrapper for form submission
     //mostly so we can use the enter key to submit
     submitForm = () => {
@@ -175,12 +241,31 @@ class PlayerEdit extends Component {
     // "usau_id": 4485966641374291
     // "uga_id": 4929999703282791
     // "active": 1 }, 
+
+
+    //TODO: add helper text to the form fields
+    //TODO: format phone numbers on the fly
     render() {
+        const default_image = "http://lorempixel.com/g/200/200/animals";
+        const default_name_add = "Add Player";
+        const default_name_edit = "Player Name";
+
+        const newPlayer = this.props.newPlayer;
         const player_details = this.state.edit_player;
         const errors = this.state.errors;
-        const nicer_nick = (player_details.nickname) ? '"' + player_details.nickname + '"' : "";
+        const nicer_nick = (player_details.nickname) ? '"' + player_details.nickname + '"' : '';
         const disabled = (Object.keys(errors).length > 0) ? true : false;
-
+        const image_path = player_details.profile_image ? player_details.profile_image : default_image;
+        const first_name = player_details.first_name ? player_details.first_name : "";
+        const last_name = player_details.last_name ? player_details.last_name : "";
+        let full_name = first_name + " " + nicer_nick + " " + last_name;
+        if (full_name.trim().length === 0) {
+            if (newPlayer) {
+                full_name = default_name_add;
+            } else {
+                full_name = default_name_edit
+            }
+        }
 
         return (
             <Modal
@@ -194,13 +279,13 @@ class PlayerEdit extends Component {
                 <div className="player-edit-modal-content" >
 
                     <div className="header">
-                        <h2>{player_details.first_name} {nicer_nick} {player_details.last_name}</h2>
+                        <h2>{full_name}</h2>
                     </div>
                     <div className="body">
                         <div className="edit-player-body-wrapper">
                             <div className="edit-player-image">
                                 <div className="edit-image-wrapper">
-                                    <img className="profile-image" src={player_details.profile_image} alt={player_details.first_name + " " + player_details.last_name + "'s avatar"} />
+                                    <img className="profile-image" src={image_path} alt={player_details.first_name + " " + player_details.last_name + "'s avatar"} />
                                     <div className="edit-image-button"><Pencil fontSize="small" className="inline-icon" /> Edit</div>
                                 </div>
                                 <p id="error-text" className="error-text"></p>
@@ -422,7 +507,7 @@ class PlayerEdit extends Component {
                                                     id="edit_active"
                                                     control={
                                                         <Radio
-                                                            checked={player_details.active === 1 ? true : false}
+                                                            checked={(newPlayer || player_details.active === 1) ? true : false}
                                                             classes={{
                                                                 checked: "radio-checked",
                                                             }}
@@ -453,6 +538,7 @@ class PlayerEdit extends Component {
                         <div className="footer-wrapper">
                             <button onClick={this.submitForm} className="modal-button submit" disabled={disabled}>Save</button>
                             <button onClick={this.closeModal} className="modal-button cancel">Close</button>
+                            {newPlayer?'':<button onClick={this.deletePlayer} className="modal-button delete">Delete</button>}
                         </div>
                     </div>
                 </div>
