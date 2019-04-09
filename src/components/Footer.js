@@ -12,6 +12,7 @@ class Footer extends Component {
                 <div className="footer-wrapper">
                     <a href="https://api.jmar.dev"><span className="footer-icon"><SubdirectoryArrowRight fontSize="small" /></span>Jordan Marchetto</a> 
                 </div>
+                <span className="hidden">{process.env.REACT_APP_REGION + " build"}</span>
             </footer>
         )
     }

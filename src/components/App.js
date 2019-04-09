@@ -11,6 +11,7 @@ import Roster from './Roster';
 import Home from './Home';
 import Footer from './Footer';
 import Loading from './Loading';
+import UserLogin from './UserLogin';
 import { Route, Redirect, BrowserRouter as Router } from 'react-router-dom'
 
 class App extends Component {
@@ -56,7 +57,7 @@ class App extends Component {
       //just show the logo and the team name for now
       return (
         <div className="chillydwags-manager-viewport" >
-          <Loading noSpinner={true} text="Chillydwags" />
+          <UserLogin />
           <Footer />
         </div>
       )

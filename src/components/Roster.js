@@ -49,7 +49,7 @@ class Roster extends Component {
 
     componentDidMount() {
         //pull current players from the server
-        fetch("https://api.jmar.dev/chillydwags/players")
+        fetch(process.env.REACT_APP_API_URL + "/players")
             .then(response => {
                 if (this.props.verbose) {
                     console.log("Fetch of 'https://api.jmar.dev/chillydwags/players' completed.")
@@ -148,7 +148,7 @@ class Roster extends Component {
                 console.log("Deleting Player: " + player_details.id);
         }
 
-        let post_url = "https://api.jmar.dev/chillydwags/players/" + player_details.id;
+        let post_url = process.env.REACT_APP_API_URL + "/players" + player_details.id;
         fetch(post_url, {
             method: 'Delete',
             headers: {
@@ -201,7 +201,7 @@ class Roster extends Component {
             console.log(JSON.stringify(player_details));
 
             this.setState({ isLoaded: false });
-            let post_url = "https://api.jmar.dev/chillydwags/players"
+            let post_url = process.env.REACT_APP_API_URL + "/players";
             let updated_players = [...this.state.players];
             await fetch(post_url, {
                 method: 'POST',
@@ -259,7 +259,7 @@ class Roster extends Component {
             console.log("Saving Player, full data:");
             console.log(player_details);
         }
-            let post_url = "https://api.jmar.dev/chillydwags/players/" + player_details.id;
+            let post_url = process.env.REACT_APP_API_URL + "/players/" + player_details.id;
             fetch(post_url, {
                 method: 'PUT',
                 headers: {

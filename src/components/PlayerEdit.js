@@ -19,7 +19,7 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import '../css/react-confirm.css'; // Import css
 
 
-Modal.setAppElement('#react-container')
+Modal.setAppElement(document.getElementById('react-container'));
 
 class PlayerEdit extends Component {
     constructor(props) {

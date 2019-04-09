@@ -80,6 +80,12 @@ button {
   box-shadow: 0px 2px 5px 2px #ddd;
 }
 
+.btn:disabled{
+  background: #ddd;
+  border-color: #999;
+  color: #999;
+}
+
 .btn-secondary {
   background: white;
   color: var(--default-text);
@@ -148,6 +154,46 @@ header {
   position: relative;
   position: absolute;
   top: -1px;
+}
+
+/** LOGIN STYLES **/
+
+.logo-wrapper{
+  text-align: center;
+}
+
+.logo-wrapper img{
+  max-height: 250px;
+  margin:1em auto 0px auto;
+}
+.login-screen {
+  display: flex;
+  align-content: space-between;
+  flex-direction: column;
+  width:100%;
+}
+.login-wrapper{
+  max-width: 350px;
+  width: 100%;
+  margin:1em auto;
+}
+
+.login-links a{
+  margin-right: 1em;
+}
+
+.login-form{
+  text-align:center;
+}
+.submit-icon{
+  float:right;
+}
+.login-screen .btn-submit{
+  width: 100%;
+  margin: 0.5em 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /** MENU STYLES **/

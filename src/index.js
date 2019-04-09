@@ -9,6 +9,5 @@ import './css/index.css';
 import App from './components/App';
 import * as serviceWorker from './serviceWorker';
 
-
 ReactDOM.render(<App />, document.getElementById('react-container'));
 serviceWorker.unregister();
