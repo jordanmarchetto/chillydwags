@@ -9,6 +9,7 @@ import React, { Component } from 'react';
 import '../css/loading.css';
 import { TextField } from '@material-ui/core';
 import { Send, ChevronLeft } from '@material-ui/icons';
+import { Link } from 'react-router-dom'
 
 class UserForgotPassword extends Component {
     render() {
@@ -38,8 +39,8 @@ class UserForgotPassword extends Component {
                     <button className="btn btn-submit">Submit <Send className="inline-icon submit-icon" /></button>
                 </div>
                 <div className="login-links">
-                    <a onClick={this.props.showLogin} href="#login"><ChevronLeft className="inline-icon" fontSize="small" />Login</a>
-                    <a onClick={this.props.showSignup} href="#sign-up">Sign Up</a>
+                    <Link to='/login'><ChevronLeft className="inline-icon" fontSize="small" />Login</Link>
+                    <Link to='/signup'>Sign Up</Link>
                 </div>
             </div>
         )

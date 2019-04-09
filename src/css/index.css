@@ -196,6 +196,16 @@ header {
   justify-content: space-between;
 }
 
+
+.login-screen button:disabled .loading-spinner{
+  color: #999 !important;
+}
+.login-screen .loading-spinner{
+  height:24px !important;
+  width:24px !important;
+  color: white !important;
+}
+
 /** MENU STYLES **/
 
 .bm-burger-button {
@@ -450,7 +460,11 @@ main {
 }
 
 .error-text {
-  color: red;
+  color: var(--chillydwags-red);
+}
+
+.success-text{
+  color:var(--secondary-color);
 }
 
 .player-edit-modal {
@@ -723,7 +737,7 @@ main {
   .edit-player-image ul {
     text-align: left;
   }
-  .error-text {
+  .error-text, .success-text{
     text-align: left;
   }
   form#player-edit {

@@ -13,6 +13,7 @@ import Footer from './Footer';
 import Loading from './Loading';
 import UserLogin from './UserLogin';
 import { Route, Redirect, BrowserRouter as Router } from 'react-router-dom'
+import Cookies from 'universal-cookie';
 
 class App extends Component {
 
@@ -32,9 +33,20 @@ class App extends Component {
   }
   render() {
     //not in use currently
-    let logged_in = true;
+    let logged_in = false;
 
-    //TODO: user accounts, registration
+    //TODO: validate the token in the cookie
+    const cookies = new Cookies();
+    let token = cookies.get('token');
+    if (token) {
+      let expir = new Date(token.expires_at);
+      let now = new Date();
+      if (now < expir) {
+        logged_in = true;
+      }
+    }
+
+
     if (logged_in) {
       return (
         <div className="chillydwags-manager-viewport" >
@@ -54,7 +66,6 @@ class App extends Component {
         </div>
       );
     } else {
-      //just show the logo and the team name for now
       return (
         <div className="chillydwags-manager-viewport" >
           <UserLogin />

@@ -11,48 +11,61 @@ import chillydawgs_logo from '../images/chillydawgs_logo.png';
 import UserLoginForm from './UserLoginForm';
 import UserRegistrationForm from './UserRegistrationForm';
 import UserForgotPassword from './UserForgotPassword';
+import { Route, BrowserRouter as Router } from 'react-router-dom'
+import Cookies from 'universal-cookie';
+
 
 class UserLogin extends Component {
+
+    //define the project basename; will either be "" or "https://www.jmar.dev/chillydwags"
+    PROJECT_HOME = `${process.env.PUBLIC_URL}/`;
 
     state = {
         login: true,
         signup: false,
         forgot_pw: false,
+        success:null
     };
 
-    showLogin = () =>{
-        this.setState({login:true, signup:false, forgot_pw:false});
-    }
-    showSignup = () =>{
-        this.setState({login:false, signup:true, forgot_pw:false});
-    }
-    showForgotpw = () =>{
-        this.setState({login:false, signup:false, forgot_pw:true});
-    }
+    submitLogin = (token) => {
+        //store the token in a cookie
+        const cookies = new Cookies();
+        cookies.set('token', JSON.stringify(token), { path: '/'  });
 
-    submitLogin = () => {
-        console.log('submit login')
+        //redirect to the dashboard
+        window.location = this.PROJECT_HOME + "dashboard"; 
 
     }
     submitForgotPassword = () => {
         console.log('submit forgot password')
 
     }
-    submitRegistration = () => {
-        console.log('submit registration form')
-
+    submitRegistration = (message) => {
+        //console.log('submit registration form callback')
+        //window.location = this.PROJECT_HOME + "login"; 
     }
 
     render() {
-        const {login, signup, forgot_pw} = this.state;
         return (
             <div className="login-screen">
                 <div className="logo-wrapper">
                     <img src={chillydawgs_logo} alt="Chillydwags Logo" />
                 </div>
-                {login?( <UserLoginForm showForgotpw={this.showForgotpw} showSignup={this.showSignup} submitForm={this.submitLogin} />):''}
-                {signup?( <UserRegistrationForm showForgotpw={this.showForgotpw} showLogin={this.showLogin} submitForm={this.submitRegistration} />):''}
-                {forgot_pw?( <UserForgotPassword showSignup={this.showSignup} showLogin={this.showLogin} submitForm={this.submitForgotPassword} />):''}
+
+                <Router basename={this.PROJECT_HOME}>
+                    <Route exact path="/" render={(props) =>
+                        <UserLoginForm {...props} submitForm={this.submitLogin} />}
+                    />
+                    <Route exact path="/login" render={(props) =>
+                        <UserLoginForm {...props} submitForm={this.submitLogin} />}
+                    />
+                    <Route exact path="/signup" render={(props) =>
+                        <UserRegistrationForm {...props} submitForm={this.submitRegistration} />}
+                    />
+                    <Route exact path="/forgot-password" render={(props) =>
+                        <UserForgotPassword {...props} submitForm={this.submitForgotPassword} />}
+                    />
+                </Router>
             </div>
         )
     }
