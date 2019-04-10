@@ -1,17 +1,16 @@
 /**
  * UserLogin.js
- * Simple component to just show the logo and potentially some text
- * Props:
- *  noSpinner - true/false
- *  text - text to be displayed below the logo in place of spinner
+ * this handles everything related to login/registration
+ * uses a router to get EU to the correct form
+ * pulls in the various form components (UserLoginForm, UserRegistrationForm, UserForgotPassword)
  */
 import React, { Component } from 'react';
 import '../css/loading.css';
 import chillydawgs_logo from '../images/chillydawgs_logo.png';
 import UserLoginForm from './UserLoginForm';
 import UserRegistrationForm from './UserRegistrationForm';
-import UserForgotPassword from './UserForgotPassword';
-import { Route, BrowserRouter as Router } from 'react-router-dom'
+//import UserForgotPassword from './UserForgotPassword';
+import { Switch, Route, BrowserRouter as Router } from 'react-router-dom'
 import Cookies from 'universal-cookie';
 
 
@@ -53,18 +52,22 @@ class UserLogin extends Component {
                 </div>
 
                 <Router basename={this.PROJECT_HOME}>
-                    <Route exact path="/" render={(props) =>
-                        <UserLoginForm {...props} submitForm={this.submitLogin} />}
-                    />
+                <Switch>
                     <Route exact path="/login" render={(props) =>
                         <UserLoginForm {...props} submitForm={this.submitLogin} />}
                     />
                     <Route exact path="/signup" render={(props) =>
                         <UserRegistrationForm {...props} submitForm={this.submitRegistration} />}
                     />
+                    {/*
                     <Route exact path="/forgot-password" render={(props) =>
                         <UserForgotPassword {...props} submitForm={this.submitForgotPassword} />}
                     />
+                    */}
+                    <Route render={(props) =>
+                        <UserLoginForm {...props} submitForm={this.submitLogin} />}
+                    />
+                    </Switch>
                 </Router>
             </div>
         )

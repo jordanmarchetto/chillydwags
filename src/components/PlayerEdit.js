@@ -8,6 +8,8 @@
  * State:
  *  modalIsOpen - true/false, if modal is showing
  *  edit_player - temporary player object for the player we're working with, is a copy of what's passed in via props
+ *  schema - yup object to verify against
+ *  errors - list of errors corresponding to field names
  */
 import React, { Component } from 'react';
 import Modal from 'react-modal';

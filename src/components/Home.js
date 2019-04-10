@@ -10,6 +10,7 @@ class Home extends Component {
         return (
             <main>
                 <img src={chillydawgs_logo} height="150px" alt="Chillydwags logo" />
+                <h2>Welcome, {this.props.user.name}</h2>
             </main>
         )
     }

@@ -20,12 +20,13 @@ import Player from './Player';
 import PlayerEdit from './PlayerEdit';
 import Loading from './Loading';
 import { AddCircleOutline } from '@material-ui/icons';
+import Cookies from 'universal-cookie';
 
 class Roster extends Component {
 
     static defaultProps = {
         version: "None",
-        verbose: true,
+        verbose: false,
         attendanceMode: false,
         dummy_players: [
             { "id": 1, "present": true, "profile_image": "https://lorempixel.com/100/100/cats/?53695", "created_at": "2019-03-22 12:23:28", "updated_at": "2019-03-22 12:23:28", "first_name": "Robby", "last_name": "Roos", "nickname": "Dooley", "phone": "+1-443-775-5095", "email": "robby.oconnell@upton.com", "uga_email": "hyatt.marcelino@grant.net", "usau_id": 4485966641374291, "uga_id": 4929999703282791, "active": 1 },
@@ -49,7 +50,13 @@ class Roster extends Component {
 
     componentDidMount() {
         //pull current players from the server
-        fetch(process.env.REACT_APP_API_URL + "/players")
+        const cookies = new Cookies();
+        let token = cookies.get("token");
+        fetch(process.env.REACT_APP_API_URL + "/players", {
+            headers: {
+                'Authorization': 'Bearer ' + token.access_token,
+              }
+        })
             .then(response => {
                 if (this.props.verbose) {
                     console.log("Fetch of 'https://api.jmar.dev/chillydwags/players' completed.")
@@ -149,11 +156,15 @@ class Roster extends Component {
         }
 
         let post_url = process.env.REACT_APP_API_URL + "/players" + player_details.id;
+        const cookies = new Cookies();
+        let token = cookies.get("token");
+
         fetch(post_url, {
             method: 'Delete',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token.access_token,
             },
             body: JSON.stringify(
                 player_details
@@ -203,11 +214,15 @@ class Roster extends Component {
             this.setState({ isLoaded: false });
             let post_url = process.env.REACT_APP_API_URL + "/players";
             let updated_players = [...this.state.players];
+            const cookies = new Cookies();
+            let token = cookies.get("token");
+    
             await fetch(post_url, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token.access_token,
                 },
                 body: JSON.stringify(
                     player_details
@@ -260,11 +275,15 @@ class Roster extends Component {
             console.log(player_details);
         }
             let post_url = process.env.REACT_APP_API_URL + "/players/" + player_details.id;
+            const cookies = new Cookies();
+            let token = cookies.get("token");
+    
             fetch(post_url, {
                 method: 'PUT',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token.access_token,
                 },
                 body: JSON.stringify(
                     player_details

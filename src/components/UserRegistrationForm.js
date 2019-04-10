@@ -1,9 +1,7 @@
 /**
- * UserLoginForm.js
- * Simple component to just show the logo and potentially some text
- * Props:
- *  noSpinner - true/false
- *  text - text to be displayed below the logo in place of spinner
+ * UserRegistrationForm.js
+ * Form for signing up a new user
+ * Functions very similar to PlayerEdit.js (and UserLoginForm.js)
  */
 import React, { Component } from 'react';
 import { TextField, CircularProgress } from '@material-ui/core';
@@ -20,19 +18,19 @@ class UserRegistrationForm extends Component {
             email: yup.string().email().required(),
             password: yup.string().required(),
         })
-        this.state = { validForm: true, formValues: {}, errors: {}, schema: schema, api_error: null, loading:false, success:null };
+        this.state = { validForm: true, formValues: {}, errors: {}, schema: schema, api_error: null, loading: false, success: null };
     }
 
+    //simple change handler for form fields, just updates the state
     handleChange = (event) => {
         let key = event.target.name;
         let val = event.target.value;
         let formValues = this.state.formValues;
         formValues[key] = val;
         this.setState({ formValues: formValues }, this.validateForm);
-        //this.setState({validForm:!this.state.validForm})
+    } //end handleChange
 
-    }
-
+    //validates the form and updates the state with errors
     validateForm = async () => {
         let result = false;
         const { formValues, schema } = this.state;
@@ -55,13 +53,13 @@ class UserRegistrationForm extends Component {
             result = false;
         }
 
-
         //update the state
         this.setState({ errors: error_list, validForm: result });
         return result;
     }
 
 
+    //handles form submission
     submitForm = async (e) => {
         e.preventDefault();
         if (await this.validateForm()) {
@@ -70,8 +68,9 @@ class UserRegistrationForm extends Component {
 
             formValues.password = pw;
             formValues.password_confirmation = pw;
+            formValues.type = "chillydwags";
 
-            this.setState({loading: true});
+            this.setState({ loading: true });
 
             await fetch(process.env.REACT_APP_AUTH_API_URL + "/signup", {
                 method: 'POST',
@@ -100,13 +99,12 @@ class UserRegistrationForm extends Component {
                 }
             );
 
-            this.setState({loading: false, success: true});
+            this.setState({ loading: false, success: true });
 
             //call the callback
             this.props.submitForm();
-
         }
-    }
+    } //end submitForm
 
     render() {
         const { api_error, validForm, formValues, errors, loading, success } = this.state;
@@ -131,112 +129,112 @@ class UserRegistrationForm extends Component {
                                     Account successfully created!
                                 </p>
                             </div>
-                            : 
-                        <form id="register" onSubmit={disabled ? null : this.submitForm} method="POST">
-                            {!validForm ? "" : <input type="submit" className="hidden" tabIndex="-1" />}
-                            <TextField
-                                name="name"
-                                className="edit-field"
-                                id="edit_name"
-                                variant="outlined"
-                                error={errors.name}
-                                onChange={this.handleChange}
-                                defaultValue={formValues.name}
-                                InputLabelProps={{
-                                    classes: {
-                                        focused: "input-focused",
-                                    }
-                                }}
-                                InputProps={{
-                                    classes: {
-                                        root: "input-root",
-                                        focused: "input-focused",
-                                        notchedOutline: "input-notchedOutline"
-                                    },
-                                }}
-                                label="Name"
-                            />
-                            <TextField
-                                name="email"
-                                className="edit-field"
-                                error={errors.email}
-                                id="edit_email"
-                                variant="outlined"
-                                onChange={this.handleChange}
-                                defaultValue={formValues.email}
-                                InputLabelProps={{
-                                    classes: {
-                                        focused: "input-focused",
-                                    }
-                                }}
-                                InputProps={{
-                                    classes: {
-                                        root: "input-root",
-                                        focused: "input-focused",
-                                        notchedOutline: "input-notchedOutline"
-                                    },
-                                }}
-                                label="Email"
-                            />
-                            <TextField
-                                name="password"
-                                className="edit-field"
-                                id="edit_password"
-                                variant="outlined"
-                                type="password"
-                                error={errors.password}
-                                onChange={this.handleChange}
-                                defaultValue={formValues.password}
-                                InputLabelProps={{
-                                    classes: {
-                                        focused: "input-focused",
-                                    }
-                                }}
-                                InputProps={{
-                                    classes: {
-                                        root: "input-root",
-                                        focused: "input-focused",
-                                        notchedOutline: "input-notchedOutline"
-                                    },
-                                }}
-                                label="Password"
-                            />
-                            <TextField
-                                name="password_confirm"
-                                className="edit-field"
-                                id="edit_password_confirm"
-                                variant="outlined"
-                                type="password"
-                                error={errors.password_confirm}
-                                onChange={this.handleChange}
-                                defaultValue={formValues.password_confirm}
-                                InputLabelProps={{
-                                    classes: {
-                                        focused: "input-focused",
-                                    }
-                                }}
-                                InputProps={{
-                                    classes: {
-                                        root: "input-root",
-                                        focused: "input-focused",
-                                        notchedOutline: "input-notchedOutline"
-                                    },
-                                }}
-                                label={errors.passwords_not_matching ? "Password (must match above)" : "Password (Confirm)"}
-                            />
-                            <button className="btn btn-submit" disabled={disabled} onClick={this.submitForm}>Submit 
+                            :
+                            <form id="register" onSubmit={disabled ? null : this.submitForm} method="POST">
+                                {!validForm ? "" : <input type="submit" className="hidden" tabIndex="-1" />}
+                                <TextField
+                                    name="name"
+                                    className="edit-field"
+                                    id="edit_name"
+                                    variant="outlined"
+                                    error={errors.name}
+                                    onChange={this.handleChange}
+                                    defaultValue={formValues.name}
+                                    InputLabelProps={{
+                                        classes: {
+                                            focused: "input-focused",
+                                        }
+                                    }}
+                                    InputProps={{
+                                        classes: {
+                                            root: "input-root",
+                                            focused: "input-focused",
+                                            notchedOutline: "input-notchedOutline"
+                                        },
+                                    }}
+                                    label="Name"
+                                />
+                                <TextField
+                                    name="email"
+                                    className="edit-field"
+                                    error={errors.email}
+                                    id="edit_email"
+                                    variant="outlined"
+                                    onChange={this.handleChange}
+                                    defaultValue={formValues.email}
+                                    InputLabelProps={{
+                                        classes: {
+                                            focused: "input-focused",
+                                        }
+                                    }}
+                                    InputProps={{
+                                        classes: {
+                                            root: "input-root",
+                                            focused: "input-focused",
+                                            notchedOutline: "input-notchedOutline"
+                                        },
+                                    }}
+                                    label="Email"
+                                />
+                                <TextField
+                                    name="password"
+                                    className="edit-field"
+                                    id="edit_password"
+                                    variant="outlined"
+                                    type="password"
+                                    error={errors.password}
+                                    onChange={this.handleChange}
+                                    defaultValue={formValues.password}
+                                    InputLabelProps={{
+                                        classes: {
+                                            focused: "input-focused",
+                                        }
+                                    }}
+                                    InputProps={{
+                                        classes: {
+                                            root: "input-root",
+                                            focused: "input-focused",
+                                            notchedOutline: "input-notchedOutline"
+                                        },
+                                    }}
+                                    label="Password"
+                                />
+                                <TextField
+                                    name="password_confirm"
+                                    className="edit-field"
+                                    id="edit_password_confirm"
+                                    variant="outlined"
+                                    type="password"
+                                    error={errors.password_confirm}
+                                    onChange={this.handleChange}
+                                    defaultValue={formValues.password_confirm}
+                                    InputLabelProps={{
+                                        classes: {
+                                            focused: "input-focused",
+                                        }
+                                    }}
+                                    InputProps={{
+                                        classes: {
+                                            root: "input-root",
+                                            focused: "input-focused",
+                                            notchedOutline: "input-notchedOutline"
+                                        },
+                                    }}
+                                    label={errors.passwords_not_matching ? "Password (must match above)" : "Password (Confirm)"}
+                                />
+                                <button className="btn btn-submit" disabled={disabled} onClick={this.submitForm}>Submit
                             {loading ?
-                                    <CircularProgress className="loading-spinner" />
-                                    :
-                                    <Send className="inline-icon submit-icon" />
-                                }
-                            </button>
-                        </form>
+                                        <CircularProgress className="loading-spinner" />
+                                        :
+                                        <Send className="inline-icon submit-icon" />
+                                    }
+                                </button>
+                            </form>
                         }
                     </div>
                     <div className="login-links">
                         <Link to='/login'><ChevronLeft className="inline-icon" fontSize="small" />Login</Link>
-                        <Link to='/forgot-password'>Forgot Password?</Link>
+                        {/*<Link to='/forgot-password'>Forgot Password?</Link>*/}
                     </div>
                 </div>
             )

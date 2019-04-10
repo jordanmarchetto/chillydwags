@@ -7,7 +7,6 @@
  *  attendanceMode - true/false, if we're in attendance mode
  * State:
  *  present - attendanceMode, if the player is actually present 
- * TODO: represent the player in state, so that we can ditch the callback stuff
  */
 import React, { Component } from 'react';
 import { Edit as Pencil } from '@material-ui/icons';

@@ -3,7 +3,7 @@
  * Sitewide header; includes the burger menu and navigation links
  */
 import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { slide as Menu } from 'react-burger-menu';
 
 class Header extends Component {
@@ -27,6 +27,11 @@ class Header extends Component {
         this.setState({ menuOpen: !this.state.menuOpen })
     }
 
+    //calls the logoutHandler from App.js
+    doLogout = () => {
+        this.setState({ menuOpen: false })
+        this.props.logoutHandler();
+    }
     render() {
         //https://negomi.github.io/react-burger-menu/
         return (
@@ -46,6 +51,7 @@ class Header extends Component {
                     <a className="menu-btn" href="https://www.ultiplays.com/teams/5bcf26c867e8380013b2827c/plays">Ultiplays</a>
                     <a className="menu-btn" href="https://www.ultianalytics.com/app/index.html#/5720008109850624/players">Ultianalytics</a>
                     <a className="menu-btn" href="https://docs.google.com/spreadsheets/d/1BtZMeBJQokDkfN_v1NyShBI3sbkF8kVe6MuVJsIC1EA/edit#gid=0">Spreadsheet</a>
+                    <Link className="menu-btn" onClick={this.doLogout} to="/logout">Logout</Link>
                 </Menu>
                 <div className="header-wrapper">
                     <h1><NavLink to="/dashboard">Chillydwags</NavLink></h1>

@@ -263,6 +263,19 @@ header {
   border-bottom: 1px white dashed;
   font-size: 1.4em;
 }
+button.bm-item{
+  background:none;
+  border-top:none;
+  border-left:none;
+  border-right:none;
+  width:100%;
+  text-align: left;
+}
+button.bm-item:hover,
+button.bm-item:active,
+button.bm-item:focus{
+  color: var(--primary-light);
+}
 
 .bm-item:last-child {
   border: none;

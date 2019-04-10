@@ -1,9 +1,7 @@
 /**
  * UserLoginForm.js
- * Simple component to just show the logo and potentially some text
- * Props:
- *  noSpinner - true/false
- *  text - text to be displayed below the logo in place of spinner
+ * Form for logging in a user.
+ * Functions very similar to PlayerEdit.js (and UserRegistrationForm.js)
  */
 import React, { Component } from 'react';
 import * as yup from 'yup';
@@ -19,20 +17,19 @@ class UserLoginForm extends Component {
             email: yup.string().email().required(),
             password: yup.string().required(),
         })
-        this.state = { validForm: true, formValues: {}, errors: {}, schema: schema, api_error: null, loading: false  };
+        this.state = { validForm: true, formValues: {}, errors: {}, schema: schema, api_error: null, loading: false };
     }
 
-
+    //simple change handler for form fields, just updates the state
     handleChange = (event) => {
         let key = event.target.name;
         let val = event.target.value;
         let formValues = this.state.formValues;
         formValues[key] = val;
         this.setState({ formValues: formValues }, this.validateForm);
-        //this.setState({validForm:!this.state.validForm})
+    } //end handleChange
 
-    }
-
+    //validates the form and updates the state with errors
     validateForm = async () => {
         let result = false;
         const { formValues, schema } = this.state;
@@ -48,13 +45,12 @@ class UserLoginForm extends Component {
             }
         });
 
-
         //update the state
-        await this.setState({ errors: error_list, validForm: result, api_error:null });
+        await this.setState({ errors: error_list, validForm: result, api_error: null });
         return result;
-    }
+    } //end validateForm
 
-
+    //handles Form submission
     submitForm = async (e) => {
         e.preventDefault();
         if (await this.validateForm()) {
@@ -94,11 +90,8 @@ class UserLoginForm extends Component {
                     this.setState({ api_error: "Invalid credentials.", loading: false });
                 }
             );
-
-
-
         }
-    }
+    } //end submitForm
 
     render() {
         const { api_error, validForm, formValues, errors, loading } = this.state;
@@ -110,61 +103,64 @@ class UserLoginForm extends Component {
                     {api_error ?
                         <div className="login-form error-text"><p>{api_error}</p></div>
                         : ''}
-                    <TextField
-                        name="email"
-                        className="edit-field"
-                        error={errors.email}
-                        id="edit_email"
-                        variant="outlined"
-                        onChange={this.handleChange}
-                        defaultValue={formValues.email}
-                        InputLabelProps={{
-                            classes: {
-                                focused: "input-focused",
-                            }
-                        }}
-                        InputProps={{
-                            classes: {
-                                root: "input-root",
-                                focused: "input-focused",
-                                notchedOutline: "input-notchedOutline"
-                            },
-                        }}
-                        label="Email"
-                    />
-                    <TextField
-                        name="password"
-                        className="edit-field"
-                        id="edit_password"
-                        variant="outlined"
-                        type="password"
-                        error={errors.password}
-                        onChange={this.handleChange}
-                        defaultValue={formValues.password}
-                        InputLabelProps={{
-                            classes: {
-                                focused: "input-focused",
-                            }
-                        }}
-                        InputProps={{
-                            classes: {
-                                root: "input-root",
-                                focused: "input-focused",
-                                notchedOutline: "input-notchedOutline"
-                            },
-                        }}
-                        label="Password"
-                    />
-                    <button className="btn btn-submit" disabled={disabled} onClick={this.submitForm}>Submit
+                    <form id="login" onSubmit={disabled ? null : this.submitForm} method="POST">
+                        {!validForm ? "" : <input type="submit" className="hidden" tabIndex="-1" />}
+                        <TextField
+                            name="email"
+                            className="edit-field"
+                            error={errors.email}
+                            id="edit_email"
+                            variant="outlined"
+                            onChange={this.handleChange}
+                            defaultValue={formValues.email}
+                            InputLabelProps={{
+                                classes: {
+                                    focused: "input-focused",
+                                }
+                            }}
+                            InputProps={{
+                                classes: {
+                                    root: "input-root",
+                                    focused: "input-focused",
+                                    notchedOutline: "input-notchedOutline"
+                                },
+                            }}
+                            label="Email"
+                        />
+                        <TextField
+                            name="password"
+                            className="edit-field"
+                            id="edit_password"
+                            variant="outlined"
+                            type="password"
+                            error={errors.password}
+                            onChange={this.handleChange}
+                            defaultValue={formValues.password}
+                            InputLabelProps={{
+                                classes: {
+                                    focused: "input-focused",
+                                }
+                            }}
+                            InputProps={{
+                                classes: {
+                                    root: "input-root",
+                                    focused: "input-focused",
+                                    notchedOutline: "input-notchedOutline"
+                                },
+                            }}
+                            label="Password"
+                        />
+                        <button className="btn btn-submit" disabled={disabled} onClick={this.submitForm}>Submit
                             {loading ?
-                            <CircularProgress className="loading-spinner" />
-                            :
-                            <Send className="inline-icon submit-icon" />
-                        }
-                    </button>
+                                <CircularProgress className="loading-spinner" />
+                                :
+                                <Send className="inline-icon submit-icon" />
+                            }
+                        </button>
+                    </form>
                 </div>
                 <div className="login-links">
-                    <Link to='/forgot-password'>Forgot Password?</Link>
+                    {/*<Link to='/forgot-password'>Forgot Password?</Link>*/}
                     <Link to='/signup'>Sign Up</Link>
                 </div>
             </div>
