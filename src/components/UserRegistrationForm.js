@@ -68,7 +68,7 @@ class UserRegistrationForm extends Component {
 
             formValues.password = pw;
             formValues.password_confirmation = pw;
-            formValues.type = "chillydwags";
+            formValues.type = "chillydwag";
 
             this.setState({ loading: true });
 

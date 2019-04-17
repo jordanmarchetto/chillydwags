@@ -134,7 +134,7 @@ class App extends Component {
       return (
         <div className="chillydwags-manager-viewport" >
           <Router basename={this.PROJECT_HOME}>
-            <Header logoutHandler={this.logoutHandler} />
+            <Header logoutHandler={this.logoutHandler} user={user} />
             <Route exact path="/" render={() => (
               <Redirect to="/dashboard" />
             )} />

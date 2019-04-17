@@ -33,6 +33,8 @@ class Header extends Component {
         this.props.logoutHandler();
     }
     render() {
+        const {user} = this.props;
+        
         //https://negomi.github.io/react-burger-menu/
         return (
             <header>
@@ -47,10 +49,10 @@ class Header extends Component {
                     <NavLink activeClassName="active" to="/roster" className="menu-btn" onClick={() => this.closeMenu()}>Roster</NavLink>
                     <NavLink activeClassName="active" to="/attendance" className="menu-btn" onClick={() => this.closeMenu()}>Attendance</NavLink>
                     <a className="menu-btn" href="http://www.jmarrr.com/chillydawgs/conditioning/">Workouts</a>
-                    <a className="menu-btn" href="https://docs.google.com/document/d/1GdU6GmBf8OQCiemrtN9fRvkzdJg-NjT2NuR8FV6n1u4/edit">Practice Plan</a>
+                    {user.type==="coach"?<a className="menu-btn" href="https://docs.google.com/document/d/1GdU6GmBf8OQCiemrtN9fRvkzdJg-NjT2NuR8FV6n1u4/edit">Practice Plan</a>:''}
                     <a className="menu-btn" href="https://www.ultiplays.com/teams/5bcf26c867e8380013b2827c/plays">Ultiplays</a>
                     <a className="menu-btn" href="https://www.ultianalytics.com/app/index.html#/5720008109850624/players">Ultianalytics</a>
-                    <a className="menu-btn" href="https://docs.google.com/spreadsheets/d/1BtZMeBJQokDkfN_v1NyShBI3sbkF8kVe6MuVJsIC1EA/edit#gid=0">Spreadsheet</a>
+                    {user.type==="coach"?<a className="menu-btn" href="https://docs.google.com/spreadsheets/d/1BtZMeBJQokDkfN_v1NyShBI3sbkF8kVe6MuVJsIC1EA/edit#gid=0">Spreadsheet</a>:''}
                     <Link className="menu-btn" onClick={this.doLogout} to="/logout">Logout</Link>
                 </Menu>
                 <div className="header-wrapper">
