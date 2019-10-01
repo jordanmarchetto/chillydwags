@@ -45,6 +45,7 @@ class Roster extends Component {
         editPlayerId: null,
         addingNewPlayer: false,
         present_players: null,
+        attendance_saved: false,
         total_players: null
     }
 
@@ -329,6 +330,77 @@ class Roster extends Component {
         this.setState({ editPlayerId: null, addingNewPlayer: false });
     } //end closePlayer
 
+    //triggered by save button
+    saveAttendance = () => {
+        console.log("saving ...");
+        //console.log(this.state.players);
+
+        //streamlined_players = this.state.players;
+        let streamlined_players = Array();
+        this.state.players.forEach(function (player) {
+            let templayer = {
+                'id': player.id,
+                'first_name': player.first_name,
+                'last_name': player.last_name,
+                'present': (player.present)?'true':'false'
+            }
+            streamlined_players.push(templayer);
+        });
+
+        let attendance_record = {
+            "recorded_by": "1",
+            "timestamp": "133",
+            "notes": "asdfl",
+            "attendance": streamlined_players
+        }
+
+        console.log(attendance_record);
+
+        let post_url = process.env.REACT_APP_API_URL + "/attendance";
+        const cookies = new Cookies();
+        let token = cookies.get("token");
+
+        fetch(post_url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token.access_token,
+            },
+            body: JSON.stringify(attendance_record)
+        }).then(response => {
+            if (response.ok) {
+                if (this.props.verbose) {
+                    console.log("Response:")
+                    console.log(response.clone().json());
+                }
+                return response.json();
+            } else {
+                throw new Error('Something went wrong ...');
+            }
+        }).then((result) => {
+
+            if (this.props.verbose) {
+                console.log("Really Successfully POST to server");
+                console.log(result);
+            }
+            //push a change to the UI here
+            this.setState({attendance_saved: true});
+
+        }).catch(error => {
+            if (this.props.verbose) {
+                console.log("Error saving attendance to server");
+                console.log(error);
+
+            }
+            this.setState({
+                error: true
+            });
+        })
+
+
+    } //end saveAttendance
+
     //used in attendance mode to calculate the number of sprints owed
     calculateSprints = () => {
         if (this.props.verbose) {
@@ -348,7 +420,7 @@ class Roster extends Component {
 
 
     render() {
-        const { error, isLoaded, players, total_players, present_players, editPlayerId, addingNewPlayer } = this.state;
+        const { error, isLoaded, players, total_players, present_players, editPlayerId, addingNewPlayer, attendance_saved } = this.state;
         const attendanceMode = this.props.takeAttendance;
 
         if (error) {
@@ -380,6 +452,12 @@ class Roster extends Component {
                                     attendanceMode={true}
                                 />
                             ))}
+                        </div>
+                        <div style={{paddingTop: '10px'}}>
+                            <a className="btn" onClick={this.saveAttendance}>Save</a>
+                            {attendance_saved ?
+                                <span>Saved.</span> : <span></span>
+                            }
                         </div>
                     </div>
                 )

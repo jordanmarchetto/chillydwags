@@ -10,6 +10,9 @@ import * as yup from 'yup';
 import sha256 from 'crypto-js/sha256';
 import { Link } from 'react-router-dom'
 
+
+
+
 class UserRegistrationForm extends Component {
     constructor(props) {
         super(props);
