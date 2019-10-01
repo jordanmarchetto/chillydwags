@@ -20,6 +20,7 @@ import Player from './Player';
 import PlayerEdit from './PlayerEdit';
 import Loading from './Loading';
 import { AddCircleOutline } from '@material-ui/icons';
+import { TextField  } from '@material-ui/core';
 import Cookies from 'universal-cookie';
 
 class Roster extends Component {
@@ -46,6 +47,7 @@ class Roster extends Component {
         addingNewPlayer: false,
         present_players: null,
         attendance_saved: false,
+        attendance_notes: null,
         total_players: null
     }
 
@@ -336,7 +338,7 @@ class Roster extends Component {
         //console.log(this.state.players);
 
         //streamlined_players = this.state.players;
-        let streamlined_players = Array();
+        let streamlined_players = [];
         this.state.players.forEach(function (player) {
             let templayer = {
                 'id': player.id,
@@ -348,9 +350,9 @@ class Roster extends Component {
         });
 
         let attendance_record = {
-            "recorded_by": "1",
-            "timestamp": "133",
-            "notes": "asdfl",
+            "recorded_by": this.props.user.id,
+            //"timestamp": "", //probably better handled by the server
+            "notes": this.state.attendance_notes,
             "attendance": streamlined_players
         }
 
@@ -401,6 +403,13 @@ class Roster extends Component {
 
     } //end saveAttendance
 
+    //update the notes field 
+    updateAttendanceNotes = (e) => {
+        this.setState({
+            attendance_notes: e.target.value
+        });
+    }//end updateAttendanceNotes
+
     //used in attendance mode to calculate the number of sprints owed
     calculateSprints = () => {
         if (this.props.verbose) {
@@ -420,7 +429,7 @@ class Roster extends Component {
 
 
     render() {
-        const { error, isLoaded, players, total_players, present_players, editPlayerId, addingNewPlayer, attendance_saved } = this.state;
+        const { error, isLoaded, players, total_players, present_players, editPlayerId, addingNewPlayer, attendance_saved, attendance_notes } = this.state;
         const attendanceMode = this.props.takeAttendance;
 
         if (error) {
@@ -453,8 +462,32 @@ class Roster extends Component {
                                 />
                             ))}
                         </div>
-                        <div style={{paddingTop: '10px'}}>
-                            <a className="btn" onClick={this.saveAttendance}>Save</a>
+                        <div>
+                        <TextField
+                            name="attendance_notes"
+                            className="edit-field"
+                            //error={errors.email}
+                            id="attendance_notes"
+                            variant="outlined"
+                            onChange={this.updateAttendanceNotes}
+                            defaultValue={attendance_notes}
+                            InputLabelProps={{
+                                classes: {
+                                    focused: "input-focused",
+                                }
+                            }}
+                            InputProps={{
+                                classes: {
+                                    root: "input-root",
+                                    focused: "input-focused",
+                                    notchedOutline: "input-notchedOutline"
+                                },
+                            }}
+                            label="Notes"
+                        />
+                        </div>
+                        <div>
+                            <button className="btn" onClick={this.saveAttendance}>Save</button>
                             {attendance_saved ?
                                 <span>Saved.</span> : <span></span>
                             }

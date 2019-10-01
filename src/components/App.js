@@ -139,9 +139,9 @@ class App extends Component {
               <Redirect to="/dashboard" />
             )} />
             <Route path="/dashboard" render={(props) => <Home {...props} user={user} />} />
-            <Route path="/roster" component={Roster} />
+            <Route path="/roster" component={Roster} user={user} />
             <Route path="/attendance"
-              render={(props) => <Roster {...props} takeAttendance={true} />}
+              render={(props) => <Roster {...props} takeAttendance={true} user={user}  />}
             />
             <Route path="/loading-screen" component={Loading} />
           </Router>
